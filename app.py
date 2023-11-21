@@ -76,22 +76,28 @@ elif page == "Data Visualization":
 
     # Display the plot in Streamlit
     st.pyplot(fig_gdp_growth)
-
-    st.write(f"### GDP in {selected_year} - Top Countries")
+    st.write(f"### GDP Growth in {selected_year} - Top Countries")
 
     # Set up the matplotlib figure for GDP
-    fig_gdp, ax_gdp = plt.subplots(figsize=(20, 40))
+   
+
+# Filter data for the selected year
+    df_selected_year = df[df['Year'] == selected_year]
+
+    # Set up the matplotlib figure for the bar chart
+    fig, ax = plt.subplots(figsize=(20, 40))
 
     # Create a bar chart using Seaborn
-    sns.barplot(x='GDP', y='Country', data=df_selected_year, palette='viridis', ax=ax_gdp)
+    sns.barplot(x='GDPGrowth%', y='Country', data=df_selected_year, palette='viridis', ax=ax)
 
     # Customize the plot
-    ax_gdp.set_xlabel('GDP')
-    ax_gdp.set_ylabel('Country')
-    ax_gdp.set_title(f'GDP in {selected_year} - Top Countries')
+    ax.set_xlabel('GDP Growth Percentage')
+    ax.set_ylabel('Country')
+    ax.set_title(f'GDP Growth in {selected_year} - Top Countries')
 
     # Display the plot in Streamlit
-    st.pyplot(fig_gdp)
+    st.pyplot(fig)
+
 
     st.write(f"### Distribution of Regions in {selected_year}")
 
