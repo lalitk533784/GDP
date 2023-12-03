@@ -21,12 +21,13 @@ df['Year'] = df['Year'].astype(int)
 region_distribution = df['Region'].value_counts()
 
 st.sidebar.header("Navigation")
-page = st.sidebar.radio("Go to", ["Home", "Data Exploration", "Data Visualization", "Linear Regression", "Random Forest Regressor"])
+page = st.sidebar.radio("Go to", ["Home", "Data Exploration", "Data Visualization", "Data Modeling","Predicted GDP"])
 
 # Display the selected page
 if page == "Home":
     st.header("Global Socio-Economic & Demographic Insights")
     st.image('https://i.imgur.com/kv1SBoB.png',  use_column_width=True)
+    st.image('https://i.redd.it/hiohq6ngiwjy.png',  use_column_width=True)
     st.write("Analyzing global socio-economic and demographic trends reveals a complex tapestry of interconnected factors shaping the world's development. Key indicators, including GDP, education levels, and healthcare access, showcase the diverse trajectories of nations. Demographic insights, such as population growth, life expectancy, and migration patterns, underscore the dynamic nature of global societies. Examining these trends over time and across regions provides critical insights into economic development, social well-being, and disparities among nations. The interplay between socio-economic and demographic variables unveils intricate relationships, highlighting the need for comprehensive strategies to address global challenges. Through rigorous data collection and analysis, researchers gain a nuanced understanding of the forces influencing societies worldwide, contributing to informed policy decisions and sustainable development goals.")
     
     st.image('https://i.imgur.com/x29Oppp.png',  use_column_width=True)
@@ -70,7 +71,7 @@ elif page == "Data Visualization":
     sns.barplot(x='GDP', y='Country', data=df_selected_year, palette='viridis', ax=ax_gdp_growth)
 
     # Customize the plot
-    ax_gdp_growth.set_xlabel('GDP  Percentage')
+    ax_gdp_growth.set_xlabel('GDP in trillion')
     ax_gdp_growth.set_ylabel('Country')
     ax_gdp_growth.set_title(f'GDP in {selected_year} - Top Countries')
 
@@ -97,7 +98,6 @@ elif page == "Data Visualization":
 
     # Display the plot in Streamlit
     st.pyplot(fig)
-
 
     st.write(f"### Distribution of Regions in {selected_year}")
 
@@ -136,7 +136,7 @@ elif page == "Data Visualization":
     # Display the heatmap in Streamlit
     st.pyplot(fig_heatmap)
 
-elif page == "Linear Regression":
+elif page == "Data Modeling":
     # Section 2: Linear Regression Predictions
     st.header(' Linear Regression Predictions')
 
@@ -224,7 +224,38 @@ elif page == "Random Forest Regressor":
 
     # Display the plot in the Streamlit app
     st.pyplot(fig_rf)
+    
 
+elif page == "Predicted GDP":
+    features = ['Year', 'SurfAreaSqKm']  # Include 'Year'
+    target = 'GDP'  # The variable you want to predict
 
+    X = df[features]
+    y = df[target]
 
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+    # Initialize the model
+    model = RandomForestRegressor()
+
+    # Train the model
+    model.fit(X_train, y_train)
+
+    # Streamlit app
+    st.title("GDP Prediction App")
+
+    # Collect user input through Streamlit widgets
+    year_options = df['Year'].unique()
+    future_year_options = range(int(df['Year'].max()) + 1, int(df['Year'].max()) + 11)
+    combined_years = list(year_options) + list(future_year_options)
+
+    selected_year = st.selectbox("Select a Year", combined_years, index=0)
+    surf_area = st.slider("Surface Area (Sq Km)", min_value=0, max_value=100000, value=50000)
+
+    # Make predictions using the trained model
+    user_input = [selected_year, surf_area]
+    prediction = int(model.predict([user_input])[0])  # Cast prediction to an integer
+
+    # Display the prediction
+    st.subheader(f"Predicted GDP for {selected_year}: {prediction}")
